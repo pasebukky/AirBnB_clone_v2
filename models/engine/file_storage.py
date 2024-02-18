@@ -10,13 +10,13 @@ class FileStorage:
 
     def all(self, cls=None):
         """Returns the list of objects of one type of class """
-        key_value_pairs = self.__objects.items()
-        sorted_pairs = []
-        for key, value in key_value_pairs:
-            if cls is None or isinstance(value, cls):
-                sorted_pairs.append((key, value))
-        sorted_dict = {key: value for key, value in sorted_pairs}
-        return sorted_dict
+        if cls is not None:
+            sorted_dict = {}
+            for key, value in self.__objects.items():
+                if cls == value.__class__ or cls == value.__class__.__name__:
+                    sorted_dict[key] = value
+            return sorted_dict
+        return self.__objects
 
     def new(self, obj):
         """Adds new object to storage dictionary"""
