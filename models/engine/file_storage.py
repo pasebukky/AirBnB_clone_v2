@@ -13,7 +13,7 @@ class FileStorage:
         key_value_pairs = self.__objects.items()
         sorted_pairs = []
         for key, value in key_value_pairs:
-            if isinstance(value, cls):
+            if cls is None or isinstance(value, cls):
                 sorted_pairs.append((key, value))
         sorted_dict = {key: value for key, value in sorted_pairs}
         return sorted_dict
@@ -62,5 +62,4 @@ class FileStorage:
         """
         if obj is not None:
             key = obj.__class__.__name__ + '.' + obj.id
-            if key in self.__objects:
-                del self.__objects[key]
+            self.__objects.pop(key, None)
