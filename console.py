@@ -3,6 +3,8 @@
 import cmd
 import sys
 from models.base_model import BaseModel
+from models.engine.file_storage import FileStorage
+from models.engine.db_storage import DBStorage
 from models.__init__ import storage
 from models.user import User
 from models.place import Place
@@ -141,7 +143,6 @@ class HBNBCommand(cmd.Cmd):
                     new_instance.__setattr__(key, int(value))
             except ValueError:
                 continue
-        storage.save()
         print(new_instance.id)
         storage.save()
 
@@ -225,12 +226,20 @@ class HBNBCommand(cmd.Cmd):
             if args not in HBNBCommand.classes:
                 print("** class doesn't exist **")
                 return
-            for k, v in storage._FileStorage__objects.items():
-                if k.split('.')[0] == args:
-                    print_list.append(str(v))
+            if isinstance(storage, FileStorage):
+                for k, v in storage.all().items():
+                    if k.split('.')[0] == args:
+                        print_list.append(str(v))
+            elif isinstance(storage, DBStorage):
+                for obj in storage.all(eval(args)):
+                    print_list.append(str(obj))
         else:
-            for k, v in storage._FileStorage__objects.items():
-                print_list.append(str(v))
+            if isinstance(storage, FileStorage):
+                for k, v in storage.all().items():
+                    print_list.append(str(v))
+            elif isinstance(storage, DBStorage):
+                for obj in storage.all():
+                    print_list.append(str(obj))
 
         print(print_list)
 
