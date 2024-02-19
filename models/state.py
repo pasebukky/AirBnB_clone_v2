@@ -24,3 +24,5 @@ class State(BaseModel, Base):
                 city_instances.append(obj)
 
         return city_instances
+
+
