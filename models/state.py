@@ -12,7 +12,8 @@ class State(BaseModel, Base):
     __tablename__ = "states"
     name = Column(String(128), nullable=False)
     cities = relationship("City", cascade='all, delete, delete-orphan',
-                           backref="state")
+                          backref="state")
+
     @property
     def related_cities(self):
         """ File storage getter attribute """
@@ -24,5 +25,3 @@ class State(BaseModel, Base):
                 city_instances.append(obj)
 
         return city_instances
-
-
