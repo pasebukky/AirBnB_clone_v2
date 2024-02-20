@@ -134,6 +134,8 @@ class HBNBCommand(cmd.Cmd):
             try:
                 key, value = param.split('=')
                 value = value.replace('_', ' ')
+                if value.lower() == 'none':
+                    new_instance.__setattr__(key, None)
                 if value.startswith('"') and value.endswith('"'):
                     new_instance.__setattr__(key, value.strip('"')
                                              .replace('\\"', '"'))
