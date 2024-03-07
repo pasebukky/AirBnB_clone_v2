@@ -13,15 +13,20 @@ env.user = "ubuntu"
 
 
 def do_pack():
-    """ Generates a tgz archive path """
+    """ Generates .tgz archive from the contents of the web_static folder """
+    if not os.path.isdir("versions"):
+        os.mkdir("versions")
+    time_format = "%Y%m%d%H%M%S"
+    output = "versions/web_static_{}.tgz".format(
+        datetime.utcnow().strftime(time_format))
     try:
-        local("mkdir -p versions")
-        date = datetime.now().strftime("%Y%m%d%H%M%S")
-        output = "versions/web_static_{}.tgz".format(date)
-        tgz_archive = local("tar -cvzf {} web_static".format(output))
-        return output
-    except Exception as e:
-        return None
+        print("Packing web_static to {}".format(output))
+        local("tar -cvzf {} web_static".format(output))
+        size = os.stat(output).st_size
+        print("web_static packed: {} -> {} Bytes".format(output, size))
+    except Exception:
+        output = None
+    return output
 
 
 def do_deploy(archive_path):
