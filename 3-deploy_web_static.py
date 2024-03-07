@@ -30,30 +30,37 @@ def do_pack():
 
 def do_deploy(archive_path):
     """ Distributes an archive totwo specific web servers """
-    if not os.path.exists(archive_path):
+    if not os.path.isfile(archive_path):
         return False
-    try:
-        archive_filename = os.path.basename(archive_path)
-        remote_tmp_path = "/tmp/{}".format(archive_filename)
-        remote_extract_path = "/data/web_static/releases/{}".format(
-            archive_filename[:-4])
 
-        put(archive_path, "/tmp/")
-        run("sudo mkdir -p {}".format(remote_extract_path))
-        run("sudo tar -xzf {} -C {}/".format(remote_tmp_path,
-                                             remote_extract_path))
-        run("sudo rm {}".format(remote_tmp_path))
-        run("sudo mv {}/web_static/* {}".format(remote_extract_path,
-                                                remote_extract_path))
-        run("sudo rm -rf {}/web_static".format(remote_extract_path))
-        run("sudo rm -rf /data/web_static/current")
-        run("sudo ln -s {} /data/web_static/current".format(
-            remote_extract_path))
+    archive_filename = archive_path.split("/")[-1]
+    name = archive_filename.split(".")[0]
 
-        print("New version deployed!")
-        return True
-    except Exception as e:
+    remote_tmp_path = "/tmp/{}".format(archive_filename)
+    remote_extract_path = "/data/web_static/releases/{}/".format(name)
+
+    if put(archive_path, remote_tmp_path).failed:
         return False
+    if run("rm -rf {}".format(remote_extract_path)).failed:
+        return False
+    if run("mkdir -p {}".format(remote_extract_path)).failed:
+        return False
+    if run("tar -xzf {} -C {}".format(remote_tmp_path,
+                                      remote_extract_path)).failed:
+        return False
+    if run("rm {}".format(remote_tmp_path)).failed:
+        return False
+    if run("mv {}/web_static/* {}".format(remote_extract_path,
+                                          remote_extract_path)).failed:
+        return False
+    if run("rm -rf {}/web_static".format(remote_extract_path)).failed:
+        return False
+    if run("rm -rf /data/web_static/current").failed:
+        return False
+    if run("ln -s {} /data/web_static/current"
+       .format(remote_extract_path)).failed:
+        return False
+    return True
 
 
 def deploy():
