@@ -14,20 +14,21 @@ env.user = "ubuntu"
 
 def do_pack():
     """ Generates a tgz archive path """
-    local("mkdir -p versions")
-    date = datetime.now().strftime("%Y%m%d%H%M%S")
-    output = "versions/web_static_{}.tgz".format(date)
-    tgz_archive = local("tar -cvzf {} web_static".format(output))
-
-    if tgz_archive.succeeded:
+    try:
+        local("mkdir -p versions")
+        date = datetime.now().strftime("%Y%m%d%H%M%S")
+        output = "versions/web_static_{}.tgz".format(date)
+        tgz_archive = local("tar -cvzf {} web_static".format(output))
         return output
-    else:
+    except Exception as e:
         return None
 
 
 def do_deploy(archive_path):
     """ Distributes an archive totwo specific web servers """
-    if os.path.exists(archive_path):
+    if not os.path.exists(archive_path):
+        return False
+    try:
         archive_filename = os.path.basename(archive_path)
         remote_tmp_path = "/tmp/{}".format(archive_filename)
         remote_extract_path = "/data/web_static/releases/{}".format(
@@ -47,8 +48,8 @@ def do_deploy(archive_path):
 
         print("New version deployed!")
         return True
-
-    return False
+    except Exception as e:
+        return False
 
 
 def deploy():
