@@ -11,6 +11,7 @@ def flask_hello():
     """ Display a specific text """
     return "Hello HBNB!"
 
+
 @app.route("/hbnb", strict_slashes=False)
 def flask_hbnb():
     """ Displays a specific text """
