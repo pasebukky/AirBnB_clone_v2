@@ -16,12 +16,9 @@ class State(BaseModel, Base):
 
     @property
     def related_cities(self):
-        """ File storage getter attribute """
-        all_objects = storage.all()
-        city_instances = []
-
-        for key, obj in all_objects.items():
-            if isinstance(obj, models.City) and obj.state_id == self.id:
-                city_instances.append(obj)
-
-        return city_instances
+        """ Getter attribute to return related cities """
+        if models.storage.__class__.__name__ != 'DBStorage':
+            return [city for city in models.storage.all(City)
+                    if city.state_id == self.id]
+        else:
+            return self.cities
