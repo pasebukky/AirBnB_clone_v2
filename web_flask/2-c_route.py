@@ -19,7 +19,7 @@ def flask_hbnb():
 
 
 @app.route("/c/<text>", strict_slashes=False)
-def flask_text():
+def flask_text(text):
     """ Displays “C ” followed by the value of the text variable """
     return "C" + text.replace("_", " ")
 
