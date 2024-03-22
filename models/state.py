@@ -11,21 +11,14 @@ class State(BaseModel, Base):
     """ State class """
     __tablename__ = "states"
     name = Column(String(128), nullable=False)
+    cities = relationship("City", cascade='all, delete, delete-orphan',
+                          backref="state")
 
-    if environ.get('HBNB_TYPE_STORAGE') == "db":
-        cities = relationship("City", cascade='all, delete, delete-orphan',
-                              backref="state")
-
-    else:
-
-        @property
-        def cities(self):
-            """ Returns the list of City instances with
-            state_id == current State.id """
-            all_cities = models.storage.all(City)
-            state_cities = []
-            for city_ins in all_cities.values():
-                if city_ins.state_id == self.id:
-                    state_cities.append(city_ins)
-
-            return state_cities
+    @property
+    def related_cities(self):
+        """ Getter attribute to return related cities """
+        if models.storage.__class__.__name__ != 'DBStorage':
+            return [city for city in models.storage.all(City)
+                    if city.state_id == self.id]
+        else:
+            return self.cities
