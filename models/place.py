@@ -9,9 +9,9 @@ import models
 
 
 association_table = Table("place_amenity", Base.metadata,
-        Column("place_id", String(60), ForeignKey("places.id"),
+        Column("place.id", String(60), ForeignKey("places.id"),
                nullable=False, primary_key=True),
-        Column("amenity_id", String(60), ForeignKey("amenities.id"),
+        Column("amenity.id", String(60), ForeignKey("amenities.id"),
                nullable=False, primary_key=True))
 
 
@@ -28,15 +28,14 @@ class Place(BaseModel, Base):
     price_by_night = Column(Integer, default=0, nullable=False)
     latitude = Column(Float)
     longitude = Column(Float)
+    reviews = relationship("Review", cascade='all, delete, delete-orphan',
+                        backref="place")
+    amenities = relationship("Amenity", secondary=association_table,
+                            viewonly=False)
+
+    amenity_ids = []
 
     if getenv("HBNB_TYPE_STORAGE", None) != "db":
-        reviews = relationship("Review", cascade='all, delete, delete-orphan',
-                               backref="place")
-
-        amenities = relationship("Amenity", secondary=association_table,
-                                 viewonly=False,
-                                 back_populates="place_amenities")
-    else:
         @property
         def reviews(self):
             """return the list of reviews for a place using FileStorage"""
